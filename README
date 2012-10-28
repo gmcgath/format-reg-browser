@@ -1,1 +1,19 @@
-I'm just messing around at the moment. Real content may follow soon.
+The format metadata browser is an experiment in using SPARQL endpoints to
+browse Linked Data on file formats from several sites. It's not a very
+useful tool as it stands, but it can be mined for several purposes:
+
+- Querying SPARQL sites using Jena (though I don't claim any great 
+experience in writing SPARQL).
+
+- Finding the SPARQL endpoints for PRONOM and UDFR. It took me some work 
+just to find out their URLs.
+
+- Developing ideas for extracting information from format registries.
+
+Feel free to pull whatever you find useful out of this; credit would be
+appreciated.
+
+Building the project with ant creates a launchable JAR file in bin/rebrowser.jar
+
+  -- Gary McGath, Professional Software Developer 
+     http://www.garymcgath.com
