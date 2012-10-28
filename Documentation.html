@@ -1,0 +1,116 @@
+<html lang="en">
+<head>
+<title>Format Registry Browser by Gary McGath</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+<body>
+<h1>Format Registry Browser, Version Dev02</h1>
+<h2>The experiment</h2>
+<p>This code is a demonstration of an experiment in browsing different file format
+registries that provide <a href="http://www.ted.com/talks/tim_berners_lee_on_the_next_web.html">Linked 
+Data</a> through a <a href="http://www.w3.org/TR/rdf-sparql-query/">SPARQL</a> endpoint.
+Two major file format repositories — <a href="http://udfr.org/">UDFR</a> and 
+<a href="http://www.nationalarchives.gov.uk/PRONOM/">PRONOM</a> — claim to offer
+such data. In addition, <a href="http://dbpedia.org/About">DBPedia</a>, a 
+project of Wikipedia, has made its semi-structured infobox data, including data
+on many file formats, available through SPARQL.
+<p>
+The code is less than elegant in places. I've put most of my effort into making
+its purpose clear rather than refining its functionality. 
+<a href="http://www.garymcgath.com">Current information on my status is here</a>
+in case you want to contact me about it.
+<p>
+PRONOM is now supported.
+There's code here for accessing Preserv2, but it's completely untested.
+I suspect I should forget about it, as there appears to be no current work
+on Preserv2 and the useful results probably went back into PRONOM. 
+It's disabled by default and may disappear in a future version.
+<p>
+Comparing the DBPedia, PRONOM, and UDFR results shows that there will be difficulties
+in combining results from different SPARQL sources. The nomenclature or
+ontology is completely different, and so is the actual information
+provided. There is no common technical language for describing file formats.
+</p>
+<h2>The application</h2>
+<p>The Format Registry Browser is a Java Swing application requiring Java 5 or
+higher. If you want to make changes, you'll need Apache Ant to rebuild
+it. It incorporates several Apache libraries (Jena, Log4J, slf4j, and Xerces)
+under the Apache 2.0 license and SLF4J under the MIT license. To run it,
+just launch <code>bin/regbrowser.jar</code>.
+Full source code is provided (if you have this file,
+you should have it), including some JUnit tests. 
+<p>
+The application does a partial string match on the contents of all blank fields.
+The comparison is case-insensitive. Characters which would mess up regular
+expressions aren't allowed; this could be improved on. These are the following
+characters: <br>
+. &amp; [ ] ? * { } | \
+<p>
+This means that you can't put a period in when searching for an extension. Search for
+"pdf", not ".pdf".
+<p>
+Javadoc is found in the <code>doc</code> directory.
+<p>
+Some configuration control is provided in 
+<code>src/com/mcgath/regbrowser/config.properties</code>. By setting the value
+of useDBPedia, useP2, and useUDFR to "y" or "n", you can select which registries
+are queried. If you make changes, use ant to rebuild the application. You can also
+set the logging level with the <code>logLevel</code> configuration variable.
+<p>
+This version tries to prettify results by doing the following:
+</p>
+<ul>
+<li>Chopping off "@en" attribute markers. If any of the information is in languages
+other than English, that's likely to be interesting, so it's left in.</li>
+<li>Truncating URIs down to their final component, in the hope that it provides
+a plausible name for the resource being referenced. </li>
+<li>Eliminating double-caret ("^^") and everything after it, which usually
+indicates the scheme of a value.
+</ul>
+<p>If you don't like these "improvements," just use the "Raw data" checkbox in
+the query window.
+<p>
+I'd like to thank Andy Jackson, Chris Rusbridge, and Euan Cochrane for 
+valuable discussion which led to this project, Peter May for publishing work on
+SPARQL queries that was essential to my figuring out UDFR access, and
+David Underdown for helping me to get PRONOM access to work.
+</p>
+<hr>
+
+
+
+<div style="font-style:italic">
+<p>
+Copyright (c) 2012, Gary McGath<br>
+ All rights reserved.
+<p>
+ Licensed under the BSD license:
+<p>
+ Redistribution and use in source and binary forms, with or without modification, 
+ are permitted provided that the following conditions are met:
+<p>
+  Redistributions of source code must retain the above copyright notice, this 
+  list of conditions and the following disclaimer.
+  Redistributions in binary form must reproduce the above copyright notice, 
+  this list of conditions and the following disclaimer in the documentation 
+  and/or other materials provided with the distribution.
+<p>
+  Neither the name of Gary McGath nor the names of contributors 
+  may be used to endorse or promote products derived from this software 
+  without specific prior written permission.
+<p>
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
+  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
+  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</p>
+</div>
+</body>
+</html>
