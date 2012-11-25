@@ -7,8 +7,8 @@ public class QueryBuilderPronom extends QueryBuilder {
     private Logger logger;
 
     /** Constructor from QueryWindow */
-    public QueryBuilderPronom(QueryWindow win) {
-        super(win);
+    public QueryBuilderPronom(FieldSource fs) {
+        super(fs);
         baseURI = Services.PRONOM_BASE_URI;
         logger = Logger.getLogger ("com.mcgath.regbrowser");
     }

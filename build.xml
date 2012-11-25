@@ -20,15 +20,17 @@
   <property name="classpath" location="lib/*.jar"/>
   <property name="doc"     location="doc"/>
   <property name="root" location="."/>
+  <property name="web" location="web"/>
+  <property name="weblib" location="web/WEB-INF/lib"/>
 
   <patternset id="properties">
      <include name="**/*.properties"/>
   </patternset>
 
-  <target name="dist" description="Create distribution" depends="rb">
+  <target name="dist" description="Create distribution" depends="rb,rbweb">
   </target>	
   	
-  <!-- Target for registry browser -->
+  <!-- Target for GUI registry browser -->
   <target name="rb" depends="compile">
     <jar destfile="${bin}/regbrowser.jar"  basedir="${classes}">
         <manifest>
@@ -47,6 +49,22 @@
         <zipfileset src="${lib}/xercesImpl.jar"/>
         <zipfileset src="${lib}/xml-apis.jar"/>
    	</jar>
+  </target>
+
+  <target name="rbweb" depends="compile">
+	    <jar destfile="${bin}/webregbrowser.jar"  basedir="${classes}">
+	        <manifest>
+	            <attribute name="Built-By" value="Gary McGath"/>
+	            <attribute name="Main-Class" value="com.mcgath.regbrowser.RegBrowser"/>
+	            <section name="common">
+	               <attribute name="Implementation-Title" value="RegBrowser"/>
+	            </section>    
+	        </manifest>	   
+	   	</jar>
+  	    <copy todir="${weblib}" file="${bin}/webregbrowser.jar"/>
+  	    <copy todir="${weblib}">
+  	    	<fileset dir="${lib}"/>
+    	</copy>
   </target>
 
   <target name="compile">

@@ -60,7 +60,7 @@ public abstract class QueryBuilder {
     private char[] BAD_CHARS = ".&[]?*{}|\\".toCharArray();
     
     /** The QueryWindow to which this is attached. */
-    private QueryWindow theQueryWindow;
+    private FieldSource theFieldSource;
     
     /** The base URI of the SPARQL endpoint. */
     protected String baseURI;
@@ -81,8 +81,8 @@ public abstract class QueryBuilder {
     protected int limit;
     
     /** Constructor, invoked by a QueryWindow */
-    public QueryBuilder(QueryWindow win) {
-        theQueryWindow = win;
+    public QueryBuilder(FieldSource source) {
+        theFieldSource = source;
         name = "";
         extension = "";
         mimeType = "";
@@ -92,12 +92,12 @@ public abstract class QueryBuilder {
     
     /** Pull the fields out of the query window. */
     public void extractFields () {
-        name = theQueryWindow.getName().trim();
-        extension = theQueryWindow.getExtension().trim();
-        mimeType = theQueryWindow.getMimeType().trim();
-        creator = theQueryWindow.getCreator().trim();
+        name = theFieldSource.getName().trim();
+        extension = theFieldSource.getExtension().trim();
+        mimeType = theFieldSource.getMimeType().trim();
+        creator = theFieldSource.getCreator().trim();
         try {
-            String limitTxt = theQueryWindow.getLimit().trim();
+            String limitTxt = theFieldSource.getLimit().trim();
             if (limitTxt.length() > 0) {
                 limit = Integer.parseInt (limitTxt);
             }

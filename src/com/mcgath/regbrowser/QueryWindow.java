@@ -60,7 +60,7 @@ import com.hp.hpl.jena.query.QuerySolution;
 
 /** This is the main form window. It has only one instance, which lasts
  *  as long as the application. */
-public class QueryWindow extends JFrame {
+public class QueryWindow extends JFrame implements FieldSource {
     
     private final static int NUM_GRID_ROWS = 6;
     /**

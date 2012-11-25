@@ -44,6 +44,8 @@ import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 
 
 import org.apache.log4j.Logger;
@@ -99,6 +101,23 @@ public class QueryManager {
         return val;
     }
 
+    /** Extract a title from a list of lists */
+    public static List<String> solutionsToTitles (List<QuerySolution> sols) {
+        List<String> titles = new ArrayList<String> (sols.size());
+        for (QuerySolution sol : sols) {
+            RDFNode title = sol.get("Name");
+            if (title != null) {
+                String titleStr = title.toString();
+                // Do some prettification: Chop off "@en" attribute.
+                if (titleStr.endsWith("@en")) {
+                    titleStr = titleStr.substring(0, titleStr.length() - 3);
+                }
+                titles.add ( titleStr);
+            }
+            else titles.add ( "(No title)");
+        }
+        return titles;
+    }
     
     /* Convert a solution to text of the form "Label: value". */
     private static List<String> solutionToText (QuerySolution sol, boolean raw) {

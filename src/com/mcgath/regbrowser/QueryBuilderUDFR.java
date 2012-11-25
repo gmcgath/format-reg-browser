@@ -46,8 +46,8 @@ public class QueryBuilderUDFR extends QueryBuilder {
 
     private Logger logger;
     
-    public QueryBuilderUDFR(QueryWindow win) {
-        super(win);
+    public QueryBuilderUDFR(FieldSource fs) {
+        super(fs);
         baseURI = Services.UDFR_BASE_URI; 
         logger = Logger.getLogger ("com.mcgath.regbrowser");
     }

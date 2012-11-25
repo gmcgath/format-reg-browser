@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+ 
+<!-- web.xml setup for the Format browser application -->
+<web-app>  
+
+	<context-param>        
+		<param-name>debug</param-name>
+		<param-value>false</param-value>
+		<description>
+			Indicates whether or not debugging messages will
+			be output to standard out. Must be [true | false].
+		</description>
+	</context-param>
+	
+
+  
+  <servlet>  
+    <servlet-name>Search</servlet-name>  
+    <servlet-class>com.mcgath.regbrowser.web.Search</servlet-class>  
+  </servlet>  
+
+
+  <servlet-mapping>  
+    <servlet-name>Search</servlet-name>  
+    <url-pattern>/search</url-pattern>  
+  </servlet-mapping>  
+  
+  <taglib>
+  	<taglib-location>/WEB-INF/tags/Result.tld</taglib-location>
+  	<taglib-uri>/tags/Result.tld</taglib-uri>
+  </taglib>
+  
+
+  <!-- The Usual Welcome File List -->  
+  <welcome-file-list>  
+    <welcome-file>index.jsp</welcome-file>  
+  </welcome-file-list>  
+  
+  <error-page>
+    <error-code>404</error-code>
+    <location>/404.html</location>
+  </error-page> 
+  
+
+  <!-- JSP Tag Library Descriptors -->  
+<!--  <taglib>  
+    <taglib-uri>/WEB-INF/tlds/struts-bean.tld</taglib-uri>  
+    <taglib-location>/WEB-INF/tlds/struts-bean.tld</taglib-location>  
+  </taglib>  
+ -->
+	
+  
+</web-app>  

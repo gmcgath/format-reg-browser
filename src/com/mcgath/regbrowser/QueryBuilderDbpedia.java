@@ -43,8 +43,8 @@ public class QueryBuilderDbpedia extends QueryBuilder {
 
     private Logger logger;
 
-    public QueryBuilderDbpedia(QueryWindow win) {
-        super(win);
+    public QueryBuilderDbpedia(FieldSource fs) {
+        super(fs);
         baseURI = Services.DBPEDIA_BASE_URI;
         logger = Logger.getLogger ("com.mcgath.regbrowser");
     }
