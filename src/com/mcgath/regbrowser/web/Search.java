@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 
 import java.util.logging.*;
@@ -31,6 +32,7 @@ public class Search extends HttpServlet {
     private final static String DBPEDIA = "DBPEDIA";
     private final static String UDFR = "UDFR";
     private final static String PRONOM = "PRONOM";
+    
     
     public void init() {
         logger = Logger.getLogger ("com.mcgath.regbrowser");
@@ -57,33 +59,88 @@ public class Search extends HttpServlet {
         String mimeType = request.getParameter("mime");
         String extension = request.getParameter ("ext");
         String creator = request.getParameter("creator");
+        String maxRespStr = request.getParameter("maxresp");
+        
+        // Check that the maximum requested responses is valid
+        int maxResp = -1;
         try {
+            maxResp = Integer.parseInt(maxRespStr);
+        }
+        catch (Exception e) {}
+        try {
+            if (maxResp < 1 || maxResp > 40) {
+                RequestDispatcher disp = ctx.getRequestDispatcher("/index.jsp");
+                request.setAttribute("topmessage", 
+                        "Maximum responses must be an integer from 1 through 40.");
+                disp.forward (request, response);
+                return;
+            }
+            
+            // The max count is good. Remember it in the session.
+            HttpSession session = request.getSession();
+            session.setAttribute("maxresp", maxResp);
+
+            // Need to specify at least one search field.
+            try {
+                if (emptyRequest (name, mimeType, extension, creator)) {
+                    RequestDispatcher disp = ctx.getRequestDispatcher("/index.jsp");
+                    request.setAttribute("topmessage", 
+                            "No serch fields have been specified.");
+                    disp.forward (request, response);
+                    return;
+                }
+            }
+            catch (Exception e) {}
+
             try {
                 Map<String, List<QuerySolution>> results =
-                        submitForm (name, mimeType, extension, creator);
+                        submitForm (name, mimeType, extension, creator, maxResp);
                 RequestDispatcher disp = ctx.getRequestDispatcher ("/result.jsp");
                 request.setAttribute("results", results);
                 disp.forward (request, response);
+                return;
             }
             catch (RegBrowserException e) {
                 RequestDispatcher errdisp = ctx.getRequestDispatcher ("/error.jsp");
+                request.setAttribute("errorinfo", e.getStackTrace());
                 errdisp.forward (request, response);
+                return;
             }
         }
         catch (IOException e) {
             logger.log (Level.INFO, "Exception in Search.java: " + e.getClass().getName() +
                     "\n" + e.getMessage());
+            // Presumably can't forward in this case.
         }
         catch (ServletException e) {
             logger.log (Level.INFO, "ServletException in Search.java: " + e.getMessage());
+            RequestDispatcher errdisp = ctx.getRequestDispatcher ("/error.jsp");
+            request.setAttribute("errorinfo", e.getStackTrace());
+            try {
+                errdisp.forward (request, response);
+            }
+            catch (Exception ee) {}
+            return;
         }
+    }
+    
+    /* Check if there are no fields specified */
+    private boolean emptyRequest (String name, 
+            String mimeType, 
+            String extension, 
+            String creator) {
+        return ((name == null || name.isEmpty()) &&
+                (mimeType == null || mimeType.isEmpty()) &&
+                (extension == null || extension.isEmpty()) &&
+                (creator == null || creator.isEmpty()));
     }
     
     
     private Map<String, List<QuerySolution>> submitForm (String name, 
             String mimeType, 
             String extension,
-            String creator) throws RegBrowserException {
+            String creator,
+            int maxResp) throws RegBrowserException {
         boolean useDBPedia = RegBrowser.getUseDBPedia();
         boolean usePronom = RegBrowser.getUsePronom();
         boolean useUDFR = RegBrowser.getUseUDFR();
@@ -100,7 +157,7 @@ public class Search extends HttpServlet {
         sfs.setMimeType (mimeType);
         sfs.setExtension (extension);
         sfs.setCreator (creator);
-        sfs.setLimit ("20");
+        sfs.setLimit (Integer.toString(maxResp));
 
         if (useDBPedia) {
             QueryBuilder dbpqb = new QueryBuilderDbpedia(sfs);

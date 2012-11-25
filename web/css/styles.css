@@ -1,0 +1,7 @@
+@CHARSET "UTF-8";
+body { background-color: #CCEEEE; }
+.searchform {width:600px;clear:both; }
+.searchform input {width:100%; clear:both; }
+.searchform input[type="submit"] {width:120px; color: #DD5555; }
+.topmessage {color:red; font-weight:bold;}
+.footer {font-size:80%;}
