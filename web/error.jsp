@@ -15,12 +15,32 @@
 if (exception != null) {
     out.print (exception.toString());
 }
-Object errorInfo = request.getAttribute("errorInfo");
+Object errorInfo = request.getAttribute("errorinfo");
 if (errorInfo != null) {
-    if (errorInfo instanceof StackTraceElement[]) {
-        StackTraceElement[] stackDump = (StackTraceElement[]) errorInfo;
-        for (StackTraceElement elem : stackDump) {
+    if (errorInfo instanceof Throwable) {
+        Throwable e = (Throwable) errorInfo;
+        out.println ("<b>" + e.getClass().getName() + "</b><br>&nbsp;<br>");
+        String msg = e.getMessage ();
+        if (msg != null) {
+            out.println (msg + "<br>");
+        }
+        StackTraceElement[] dump = e.getStackTrace();;
+        for (StackTraceElement elem : dump) {
             out.print (elem.toString() + "<br>");
+        }
+        
+        Throwable cause = e.getCause();
+        if (cause != null) {
+            out.println ("<br>&nbsp;<br>Caused by:<br>");
+            out.println ("<b>" + cause.getClass().getName() + "</b><br>&nbsp;<br>");
+            msg = cause.getMessage ();
+            if (msg != null) {
+                out.println (msg + "<br>");
+            }
+            dump = cause.getStackTrace();;
+            for (StackTraceElement elem : dump) {
+                out.print (elem.toString() + "<br>");
+            }
         }
     }
     else {
@@ -28,6 +48,8 @@ if (errorInfo != null) {
     }
 }
 %>
+
+<p><a href="index.jsp">Return to search form</a></p>
 
 <%@include file="footer.html" %>
 

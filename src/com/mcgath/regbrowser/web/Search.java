@@ -18,12 +18,14 @@ import javax.servlet.http.HttpSession;
 import java.util.logging.*;
 
 import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.sparql.engine.http.QueryExceptionHTTP;
 import com.mcgath.regbrowser.QueryBuilder;
 import com.mcgath.regbrowser.QueryBuilderDbpedia;
 import com.mcgath.regbrowser.QueryBuilderPronom;
 import com.mcgath.regbrowser.QueryBuilderUDFR;
 import com.mcgath.regbrowser.RegBrowser;
 import com.mcgath.regbrowser.RegBrowserException;
+import com.mcgath.regbrowser.UncleanInputException;
 
 public class Search extends HttpServlet {
 
@@ -33,6 +35,9 @@ public class Search extends HttpServlet {
     private final static String UDFR = "UDFR";
     private final static String PRONOM = "PRONOM";
     
+    /* Characters allowed in a search field */
+    private final static String CLEAN_CHARS =
+            "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.,$ ";
     
     public void init() {
         logger = Logger.getLogger ("com.mcgath.regbrowser");
@@ -100,9 +105,28 @@ public class Search extends HttpServlet {
                 disp.forward (request, response);
                 return;
             }
+            catch (UncleanInputException e) {
+                RequestDispatcher disp = ctx.getRequestDispatcher("/index.jsp");
+                request.setAttribute("topmessage", 
+                        e.getMessage());
+                disp.forward (request, response);
+                return;
+            }
             catch (RegBrowserException e) {
                 RequestDispatcher errdisp = ctx.getRequestDispatcher ("/error.jsp");
-                request.setAttribute("errorinfo", e.getStackTrace());
+                Throwable cause = e.getCause();
+                if (cause instanceof QueryExceptionHTTP) {
+                    String cmsg = cause.getMessage ();
+                    String message = "Communication problem with SPARQL server. " +
+                        "Try again later. ";
+                    if (cmsg != null) {
+                        message += "<br>" + cmsg;
+                    }
+                    request.setAttribute("errorinfo", message);
+                }
+                else {
+                    request.setAttribute("errorinfo", e);
+                }
                 errdisp.forward (request, response);
                 return;
             }
@@ -115,7 +139,7 @@ public class Search extends HttpServlet {
         catch (ServletException e) {
             logger.log (Level.INFO, "ServletException in Search.java: " + e.getMessage());
             RequestDispatcher errdisp = ctx.getRequestDispatcher ("/error.jsp");
-            request.setAttribute("errorinfo", e.getStackTrace());
+            request.setAttribute("errorinfo", e);
             try {
                 errdisp.forward (request, response);
             }
@@ -140,7 +164,7 @@ public class Search extends HttpServlet {
             String mimeType, 
             String extension,
             String creator,
-            int maxResp) throws RegBrowserException {
+            int maxResp) throws RegBrowserException, UncleanInputException {
         boolean useDBPedia = RegBrowser.getUseDBPedia();
         boolean usePronom = RegBrowser.getUsePronom();
         boolean useUDFR = RegBrowser.getUseUDFR();
@@ -153,9 +177,21 @@ public class Search extends HttpServlet {
         List<QuerySolution> udfrResults = new ArrayList<QuerySolution> (1);
 
         sfs = new ServletFieldSource();
+        if (!isClean(name)) {
+            throw new UncleanInputException("Name field contains disallowed characters.");
+        }
         sfs.setName (name);
+        if (!isClean(mimeType)) {
+            throw new UncleanInputException("MIME type field contains disallowed characters.");
+        }
         sfs.setMimeType (mimeType);
+        if (!isClean(extension)) {
+            throw new UncleanInputException("Extension field contains disallowed characters.");
+        }
         sfs.setExtension (extension);
+        if (!isClean(creator)) {
+            throw new UncleanInputException("Creator field contains disallowed characters.");
+        }
         sfs.setCreator (creator);
         sfs.setLimit (Integer.toString(maxResp));
 
@@ -201,5 +237,16 @@ public class Search extends HttpServlet {
 //              "  Cause:" +
 //              causeStr);
 //    }
+    
+    /* Check if a search field contains only permitted characters */
+    private boolean isClean(String str) {
+        char[] chars = str.toCharArray();
+        for (char ch : chars) {
+            if (CLEAN_CHARS.indexOf(ch) < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 }
